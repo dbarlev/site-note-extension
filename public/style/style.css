@@ -1,0 +1,11 @@
+#siteNote-noteContainer{
+    border: 2px solid red !important;
+    background: white !important;
+    position: absolute !important;
+    top: 2%;
+    right: 2%;
+    width: 300px;
+    height: 150px;
+    z-index: 999999999 !important;
+    border-radius: 5px;
+}

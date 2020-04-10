@@ -1,0 +1,43 @@
+  {
+    "name": "Site Notes",
+    "description": "User1st Plugin for Qa Testing Tool",
+    "version": "1.0",
+    "manifest_version": 2,
+    "permissions": [
+      "management",
+      "background",
+      "storage",
+      "tabs",
+      "contextMenus",
+      "*://*/*"
+    ],
+    "background": {
+      "scripts": [
+        "background.js"
+      ],
+      "persistent": true
+    },
+    "browser_action": {
+      "default_icon": "img/icon.png",
+      "default_title": "Site Notes"
+    },
+    "icons": {
+      "16": "img/icon.png",
+      "48": "img/icon.png"
+    },
+    "content_scripts": [
+      {
+        "run_at": "document_start",
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ],
+        "css": [
+          "style/style.css"
+        ],
+        "js": [
+          "main.js"
+        ]
+      }
+    ]
+  }

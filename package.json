@@ -1,0 +1,22 @@
+{
+  "name": "notes-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.1.1",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "draggable": "^4.2.0",
+    "moveable": "^0.16.3",
+    "sortablejs": "^1.10.2"
+  }
+}
