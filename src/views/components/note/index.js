@@ -48,7 +48,21 @@ module.exports = class Note {
     create() {
         this.noteElement = document.createElement("div");
         this.noteElement.id = this.id;
+        this.toggleEditMode();
         this.noteElement.innerHTML = this.data ? `<span>Danny${this.data.text}</span>` : `<span>Danny The King</span>`;
+    }
+
+    toggleEditMode() {
+        this.noteElement.addEventListener("click", () => {
+            let moveableElement = document.querySelector(".danny");
+            let classNames = moveableElement.classList;
+            if (classNames.contains("show")) {
+                moveableElement.classList.remove("show");
+            }
+            else {
+                moveableElement.classList.add("show");
+            }
+        })
     }
 
     addStyle() {
@@ -62,6 +76,7 @@ module.exports = class Note {
 
     adjust() {
         const moveable = new Moveable(document.body, {
+            className: "danny show",
             target: document.getElementById(this.id),
             draggable: true,
             resizable: true

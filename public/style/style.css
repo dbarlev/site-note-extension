@@ -5,3 +5,11 @@
     z-index: 999999999 !important;
     border-radius: 5px;
 }
+
+.moveable-control-box{
+    display: none !important;
+}
+
+.moveable-control-box.show{
+    display: block !important;
+}
