@@ -1,17 +1,22 @@
 const Moveable = require('moveable').default;
 const NotesService = require("../../../data/services/noteService");
+const Utils = require("../../../utils/utils");
+const Iframe = require("../../../common/iframe/iframe");
 
 module.exports = class Note {
 
     constructor(element) {
         this.element = element;
+        this.iframeInstance;
         this.noteElement = null;
-        this.id = "siteNote-noteContainer";
+        this.frameContent;
+        this.id = `siteNote-${Utils.uuidv4()}`;
+        this.className = 'siteNote';
         this.data;
         this.noteServiceInstance;
         this.noteParams = {
-            width: 300,
-            height: 150,
+            width: 330,
+            height: 215,
             position: {
                 left: 10,
                 top: 10
@@ -22,13 +27,14 @@ module.exports = class Note {
 
     init() {
         (async () => {
-            this.noteServiceInstance = await NotesService.getInstance();
-            this.data = this.noteServiceInstance.data && this.noteServiceInstance.data[0];
-            this.resetParams();
+            if (!Utils.isNoteAlreadyExist()) {
+                this.noteServiceInstance = await NotesService.getInstance();
+                this.data = this.noteServiceInstance.data && this.noteServiceInstance.data[0];
+                this.resetParams();
+            }
             this.create();
             this.addStyle();
             this.setPosition();
-            this.inject();
             this.adjust();
         })();
     }
@@ -41,20 +47,45 @@ module.exports = class Note {
     }
 
     setPosition() {
-        this.noteElement.style.left = this.noteParams.position.left + "px";
-        this.noteElement.style.top = this.noteParams.position.top + "px";
+        this.iframeInstance.iframeContainer.style.left = this.noteParams.position.left + "px";
+        this.iframeInstance.iframeContainer.style.top = this.noteParams.position.top + "px";
     }
 
     create() {
-        this.noteElement = document.createElement("div");
-        this.noteElement.id = this.id;
-        this.toggleEditMode();
-        this.noteElement.innerHTML = this.data ? `<span>Danny${this.data.text}</span>` : `<span>Danny The King</span>`;
+        this.iframeInstance = new Iframe(this.id, this.className);
+        this.noteElement = this.iframeInstance.iframe;
+        this.frameContent = this.noteElement.iframeDocument;
+        // this.toggleEditMode();
+        this.constructContent();
+    }
+
+    constructContent() {
+        let data = this.data ? `<span>Danny${this.data.text}</span>` : `<span> Danny The King</span>`;
+        let html = `
+            <div class="note-content">
+                <div class="note-textContent">
+                    <p class="textarea" contenteditable="true" placeholder="Start typing here..." ></p>
+                </div>
+                <div class="note-sidebar">
+                    <div class="iconContainer">
+                        <i class="far fa-edit"></i>
+                    </div>
+                    <div class="iconContainer">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="iconContainer">
+                        <i class="fas fa-arrows-alt"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.iframeInstance.addHtml(html);
     }
 
     toggleEditMode() {
-        this.noteElement.addEventListener("click", () => {
-            let moveableElement = document.querySelector(".danny");
+        this.iframeInstance.iframeContainer.addEventListener("click", () => {
+            let moveableElement = document.querySelector(`#${this.id}`);
             let classNames = moveableElement.classList;
             if (classNames.contains("show")) {
                 moveableElement.classList.remove("show");
@@ -66,17 +97,13 @@ module.exports = class Note {
     }
 
     addStyle() {
-        this.noteElement.style.height = this.noteParams.height + "px";
-        this.noteElement.style.width = this.noteParams.width + "px";
-    }
-
-    inject() {
-        document.body.append(this.noteElement)
+        this.iframeInstance.iframeContainer.style.height = this.noteParams.height + "px";
+        this.iframeInstance.iframeContainer.style.width = this.noteParams.width + "px";
     }
 
     adjust() {
         const moveable = new Moveable(document.body, {
-            className: "danny show",
+            className: this.id,
             target: document.getElementById(this.id),
             draggable: true,
             resizable: true
@@ -96,7 +123,7 @@ module.exports = class Note {
                 }
             })
             .on("dragEnd", ({ target, left, top }) => {
-                NotesService.save("drag", this.noteParams);
+                //NotesService.save("drag", this.noteParams);
             });
     }
 
@@ -111,7 +138,7 @@ module.exports = class Note {
                 }
             })
             .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
-                NotesService.save("resize", this.noteParams);
+                //NotesService.save("resize", this.noteParams);
             });
     }
 }
