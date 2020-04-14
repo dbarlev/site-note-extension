@@ -103,7 +103,7 @@ module.exports = class Note {
 
     adjust() {
         const moveable = new Moveable(document.body, {
-            className: this.id,
+            className: this.id + " " + "show",
             target: document.getElementById(this.id),
             draggable: true,
             resizable: true

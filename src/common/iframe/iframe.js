@@ -51,11 +51,19 @@ module.exports = class Iframe {
         this.iframeContainer.id = this.id;
         this.iframeContainer.classList.add(this.className);
 
-        this.headerElement = document.createElement("div");
-        this.headerElement.classList.add("siteNote-header");
+        const html = `
+            <div class="siteNote-header">
+                <div class="note-logo">
+                    <div class="note-sublogo">
+                
+                    </div>
+                </div>
+                <div class="note-headerText">Site Note</div>
+            </div>
+        `;
+        this.iframeContainer.innerHTML += html;
 
         this.iframe = document.createElement("iframe");
-        this.iframeContainer.append(this.headerElement);
         this.iframeContainer.append(this.iframe);
         document.body.append(this.iframeContainer);
         this.iframe.onload = this.onIframeLoad();
@@ -67,10 +75,6 @@ module.exports = class Iframe {
         const linkCss = `<link rel="stylesheet" type="text/css" href="${fontawesome}">`;
         this.iframeDocument.head.innerHTML += `<style>${css}</style>`;
         this.iframeDocument.head.innerHTML += linkCss;
-    }
-
-    bindEvent() {
-
     }
 
     addHtml(html) {

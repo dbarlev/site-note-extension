@@ -6,7 +6,7 @@
     border-radius: 1px;
     border: none !important;
     display: grid;
-    grid-template-rows: 0.7fr 4fr;
+    grid-template-rows: 30px 1fr;
 }
 
 .siteNote .siteNote-header{
@@ -41,4 +41,33 @@
 
 .moveable-control-box.show{
     display: block !important;
+}
+
+.siteNote-header{
+    display: grid;
+    grid-template-columns: 0.2fr 2fr;
+}
+
+.note-headerText{
+    line-height: 30px;
+}
+
+.note-logo{
+    border-radius: 50%;
+    background: black;
+    width: 17px;
+    height: 17px;
+    position: relative;
+    top: 7px;
+    left: 5px;
+}
+
+.note-sublogo{
+    border-radius: 50%;
+    background: white;
+    width: 13px;
+    height: 13px;
+    position: relative;
+    left: 2px;
+    top: 2px;
 }
