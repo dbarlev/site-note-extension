@@ -1,6 +1,7 @@
 const Moveable = require('moveable').default;
 const Utils = require("../../../utils/utils");
 const Iframe = require("../../../common/iframe/iframe");
+const Footer = require("../../html/footer/footer");
 
 module.exports = class Note {
 
@@ -57,16 +58,16 @@ module.exports = class Note {
     }
 
     constructContent() {
+        const { footerIcons, saveText, chooseColor } = Footer;
         let html = `
             <div class="note-container">
                 <div class="note-content">
                     <p class="textarea" contenteditable="true" placeholder="Start typing here..." >${this.noteParams.text}</p>
                 </div>
                 <div class="footer">
-                    <div class="save">
-                        <i class="fas fa-check"></i>
-                        <span>SAVE</span>
-                    </div>
+                    ${footerIcons}
+                    ${saveText}
+                    ${chooseColor}
                 </div>
             </div>
         `;
@@ -75,6 +76,7 @@ module.exports = class Note {
         let saveElement = this.frameContent.querySelector(".save");
 
         this.frameContent.querySelector(".textarea").addEventListener("input", () => {
+            saveElement.parentElement.classList.add("show");
             saveElement.classList.add("show");
         });
 
@@ -84,7 +86,14 @@ module.exports = class Note {
                 this.noteParams.text = text;
                 this.notesService.saveOrEdit(this.noteParams);
             }
+            saveElement.parentElement.classList.remove("show");
             saveElement.classList.remove("show");
+        });
+
+        this.frameContent.querySelector(".icon-container.color").addEventListener("click", () => {
+            saveElement.parentElement.classList.add("show");
+            const colorPlateElement = this.frameContent.querySelector(".chooseColorContainer");
+            colorPlateElement.classList.add("show");
         });
     }
 

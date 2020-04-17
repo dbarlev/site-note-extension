@@ -25,15 +25,98 @@ const css = `
 
     .footer{
         text-align: center;
+        background: rgb(255, 223, 165) !important;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        height: 31px;
+    }
+
+    .show .edit-icons{
+        display: none;
+    }
+
+    .edit-icons{
+        display: block;
+        font-size: 12px;
+        margin-top: 5px;
+        cursor: pointer;
+    }
+
+    .icon-container{
+        margin-right: 10px;
+    }
+
+    .icon-container.remove:hover{
+        color: #e60606;
+    }
+
+    .icon-container.color:hover{
+        color: #0089ff;
+    }
+
+    .icon-container span{
+        font-size: 10px;
     }
 
     .save{
         cursor: pointer;
+        font-size: 12px;
         display: none;
     }
 
     .save.show{
         display: block;
+        margin-top: 5px;
+    }
+
+    .chooseColorContainer.show{
+        display: block;
+    }
+
+    .chooseColorContainer{
+        display: none;
+    }
+
+    .chooseColor{
+        display: inline-block;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .red{
+        background: #ff210a;
+    }
+
+    .green{
+        background: #2db115;
+    }
+
+    .blue{
+        background: #0072ff;
+    }
+
+    .orange{
+        background: rgb(255, 223, 165);
+    }
+
+    .purple{
+        background: #b71eb7;
+    }
+
+    .pink{
+        background: #f5526f;
+    }
+
+    .white{
+        background: white;
+    }
+
+    .black{
+        background: black;
     }
 `;
 
