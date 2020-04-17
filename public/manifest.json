@@ -1,6 +1,6 @@
   {
     "name": "Site Notes",
-    "description": "User1st Plugin for Qa Testing Tool",
+    "description": "Sticky note creation on any site",
     "version": "1.0",
     "manifest_version": 2,
     "permissions": [

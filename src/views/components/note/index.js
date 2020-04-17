@@ -1,45 +1,43 @@
 const Moveable = require('moveable').default;
-const NotesService = require("../../../data/services/noteService");
 const Utils = require("../../../utils/utils");
 const Iframe = require("../../../common/iframe/iframe");
 
 module.exports = class Note {
 
-    constructor(element) {
-        this.element = element;
+    constructor(notesService, data) {
+        this.notesService = notesService;
         this.iframeInstance;
-        this.noteElement = null;
+        this.noteElement;
         this.frameContent;
         this.id = `siteNote-${Utils.uuidv4()}`;
         this.className = 'siteNote';
-        this.data;
+        this.data = data ? data : null;
         this.noteServiceInstance;
         this.noteParams = {
-            width: 330,
-            height: 215,
+            id: this.id,
+            width: 350,
+            height: 250,
             position: {
                 left: 10,
                 top: 10
-            }
+            },
+            text: ""
         }
         this.init();
     }
 
     init() {
-        (async () => {
-            if (!Utils.isNoteAlreadyExist()) {
-                this.noteServiceInstance = await NotesService.getInstance();
-                this.data = this.noteServiceInstance.data && this.noteServiceInstance.data[0];
-                this.resetParams();
-            }
-            this.create();
-            this.addStyle();
-            this.setPosition();
-            this.adjust();
-        })();
+        this.data && this.resetParams();
+        this.create();
+        this.addStyle();
+        this.setPosition();
+        this.adjust();
     }
 
     resetParams() {
+        this.noteParams.id = this.data.id;
+        this.id = this.data.id;
+        this.noteParams.text = this.data && this.data.text || this.noteParams.text;
         this.noteParams.width = this.data && this.data.width || this.noteParams.width;
         this.noteParams.height = this.data && this.data.height || this.noteParams.height;
         this.noteParams.position.top = this.data && this.data.position && this.data.position.top || this.noteParams.position.top;
@@ -54,33 +52,40 @@ module.exports = class Note {
     create() {
         this.iframeInstance = new Iframe(this.id, this.className);
         this.noteElement = this.iframeInstance.iframe;
-        this.frameContent = this.noteElement.iframeDocument;
-        // this.toggleEditMode();
+        this.frameContent = this.iframeInstance.iframeDocument;
         this.constructContent();
     }
 
     constructContent() {
-        let data = this.data ? `<span>Danny${this.data.text}</span>` : `<span> Danny The King</span>`;
         let html = `
-            <div class="note-content">
-                <div class="note-textContent">
-                    <p class="textarea" contenteditable="true" placeholder="Start typing here..." ></p>
+            <div class="note-container">
+                <div class="note-content">
+                    <p class="textarea" contenteditable="true" placeholder="Start typing here..." >${this.noteParams.text}</p>
                 </div>
-                <div class="note-sidebar">
-                    <div class="iconContainer">
-                        <i class="far fa-edit"></i>
-                    </div>
-                    <div class="iconContainer">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <div class="iconContainer">
-                        <i class="fas fa-arrows-alt"></i>
+                <div class="footer">
+                    <div class="save">
+                        <i class="fas fa-check"></i>
+                        <span>SAVE</span>
                     </div>
                 </div>
             </div>
         `;
 
         this.iframeInstance.addHtml(html);
+        let saveElement = this.frameContent.querySelector(".save");
+
+        this.frameContent.querySelector(".textarea").addEventListener("input", () => {
+            saveElement.classList.add("show");
+        });
+
+        this.frameContent.querySelector(".save").addEventListener("click", () => {
+            let text = this.frameContent.querySelector(".textarea").innerText;
+            if (text && text.trim() !== "") {
+                this.noteParams.text = text;
+                this.notesService.saveOrEdit(this.noteParams);
+            }
+            saveElement.classList.remove("show");
+        });
     }
 
     toggleEditMode() {
@@ -103,7 +108,7 @@ module.exports = class Note {
 
     adjust() {
         const moveable = new Moveable(document.body, {
-            className: this.id + " " + "show",
+            className: this.id,
             target: document.getElementById(this.id),
             draggable: true,
             resizable: true
@@ -123,7 +128,7 @@ module.exports = class Note {
                 }
             })
             .on("dragEnd", ({ target, left, top }) => {
-                //NotesService.save("drag", this.noteParams);
+                //this.notesService.saveOrEdit(this.noteParams, "drag");
             });
     }
 
@@ -138,7 +143,7 @@ module.exports = class Note {
                 }
             })
             .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
-                //NotesService.save("resize", this.noteParams);
+                //this.notesService.saveOrEdit(this.noteParams, "resize");
             });
     }
 }

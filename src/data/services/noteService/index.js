@@ -1,18 +1,21 @@
 const storage = require("../../storage");
 
 /*
-    [
-        {
-            url: "",
-            type: "drag|scale|resize",
-            position:{
-                left,
-                top
-            },
-            text: "",
-            template: ""
-        }
-    ]
+    notes: {
+        "SITE_URL": [
+            {
+                id: "",
+                url: "",
+                type: "drag|scale|resize",
+                position:{
+                    left,
+                    top
+                },
+                text: "",
+                template: ""
+            }
+        ]
+    }
 */
 
 
@@ -20,59 +23,91 @@ class NotesService {
 
     constructor() {
         this.data = null;
+        this.filteredNotes = [];
     }
 
     async getInstance() {
         if (!this.data) {
             try {
-                const notesFromStorage = await storage.GetFromStorage("notes");
-                this.data = notesFromStorage ? notesFromStorage.notes : [];
+                this.data = await storage.GetFromStorage("notes");
             } catch (error) {
-                this.data = [];
+                this.data = {};
             }
             const filteredNotes = this.getSiteNotes();
-            this.data = filteredNotes ? filteredNotes : this.data;
+            this.filteredNotes = filteredNotes || [];
         }
         return this;
     }
 
-    save(type, data) {
-        let isExist = this.getSiteNotesAndIndex();
+    saveOrEdit(data, type) {
+        let notesByUrl = this.getSiteNotesByUrl();
+        let notesByID = this.getSiteNotesByID(data.id, notesByUrl);
 
-        if (isExist) {
-            this.update(isExist.index, type, data);
+        if (notesByUrl && notesByID) {
+            this.update(data, notesByID, type);
         }
         else {
-            this.data.push({
-                url: location.href,
-                type,
-                ...data
-            })
-            storage.SetToStorage({ notes: this.data });
+            this.save(data, notesByUrl, type);
         }
     }
 
-    update(index, type, data) {
-        this.data[index] = {
+    save(data, notesByUrl, type) {
+        let newNoteData = {
             url: location.href,
-            type,
             ...data
         };
+
+        if (type)
+            newNoteData.type = type;
+
+        if (notesByUrl) {
+            this.data[location.href].push(newNoteData);
+        }
+        else {
+            this.data[location.href] = [newNoteData];
+        }
+
+        storage.SetToStorage({ notes: this.data });
+    }
+
+    update(data, notesByID, type) {
+        let newData = {
+            url: location.href,
+            ...data
+        };
+        this.data[location.href][notesByID.index] = newData;
         storage.SetToStorage({ notes: this.data });
     }
 
     getSiteNotes() {
-        return this.data && this.data.length && this.data.filter((note, index) => {
-            return note.url === location.href;
-        });
+        return this.data && this.data[location.href];
     }
 
-    getSiteNotesAndIndex() {
-        let notes = this.data && this.data.length && this.data.map((note, index) => {
-            return note.url === location.href ? { note, index } : false;
+    getSiteNotesByUrl() {
+        let urls = Object.keys(this.data);
+        if (!urls.length)
+            return;
+
+        let notes = [];
+        urls && urls.length && urls.forEach((url, index) => {
+            if (url === location.href) {
+                notes = this.data[url];
+            }
         });
-        return notes ? notes[0] : false;
+        return notes && notes.length ? notes : false;
     }
+
+    getSiteNotesByID(id, notes) {
+        let noteData = false;
+        notes && notes.length && notes.forEach((note, index) => {
+            if (note.id === id) {
+                noteData = { note, index };
+            }
+        });
+        return noteData || false;
+    }
+
+
 }
 
 module.exports = new NotesService();

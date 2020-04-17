@@ -6,7 +6,7 @@ export const SetToStorage = (data) => {
 export const GetFromStorage = (name) => {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(name, (result) => {
-            result[name] ? resolve(result) : reject();
+            result[name] ? resolve(result[name]) : resolve({});
         });
     })
 }

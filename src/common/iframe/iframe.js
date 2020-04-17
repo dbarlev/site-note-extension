@@ -1,8 +1,7 @@
 const css = `
     .note-content{
-        display: grid;
-        grid-template-columns: 4fr 0.6fr;
         height: 100%;
+        width: 100%;
     }
 
     [contenteditable][placeholder]:empty:before {
@@ -18,16 +17,23 @@ const css = `
         cursor: text;
     }
 
-    .note-sidebar{
+    .note-container{
         display: grid;
-        grid-template-rows: 1fr 1fr 1fr;
-        margin: 5px;
+        height: 100%;
+        grid-template-rows: 4fr 0.6fr;
     }
 
-    i{
-        font-size: 25px;
-        color: #0870b9;
+    .footer{
+        text-align: center;
+    }
+
+    .save{
         cursor: pointer;
+        display: none;
+    }
+
+    .save.show{
+        display: block;
     }
 `;
 
@@ -51,6 +57,15 @@ module.exports = class Iframe {
         this.iframeContainer.id = this.id;
         this.iframeContainer.classList.add(this.className);
 
+        this.constructIframeHeader();
+        this.iframe = document.createElement("iframe");
+
+        this.iframeContainer.append(this.iframe);
+        document.body.append(this.iframeContainer);
+        this.iframe.onload = this.onIframeLoad();
+    }
+
+    constructIframeHeader() {
         const html = `
             <div class="siteNote-header">
                 <div class="note-logo">
@@ -62,11 +77,6 @@ module.exports = class Iframe {
             </div>
         `;
         this.iframeContainer.innerHTML += html;
-
-        this.iframe = document.createElement("iframe");
-        this.iframeContainer.append(this.iframe);
-        document.body.append(this.iframeContainer);
-        this.iframe.onload = this.onIframeLoad();
     }
 
     onIframeLoad() {
