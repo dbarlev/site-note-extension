@@ -7,7 +7,7 @@ const css = `
     [contenteditable][placeholder]:empty:before {
         content: attr(placeholder);
         position: absolute;
-        color: gray;
+        color: #000000a6;
         background-color: transparent;
     }
 
@@ -85,38 +85,6 @@ const css = `
         height: 20px;
         margin-right: 10px;
         cursor: pointer;
-    }
-
-    .red{
-        background: #ff210a;
-    }
-
-    .green{
-        background: #2db115;
-    }
-
-    .blue{
-        background: #0072ff;
-    }
-
-    .orange{
-        background: rgb(255, 223, 165);
-    }
-
-    .purple{
-        background: #b71eb7;
-    }
-
-    .pink{
-        background: #f5526f;
-    }
-
-    .white{
-        background: white;
-    }
-
-    .black{
-        background: black;
     }
 `;
 

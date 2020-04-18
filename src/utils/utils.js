@@ -1,3 +1,5 @@
+const Colors = require("../common/colors");
+
 class Utils {
 
     uuidv4() {
@@ -7,8 +9,17 @@ class Utils {
         });
     }
 
-    isNoteAlreadyExist(){
+    isNoteAlreadyExist() {
         return document.querySelector(".siteNote");
+    }
+
+    setNoteColors(frameDocument, id, color) {
+        const mainWrapper = document.getElementById(id);
+        const headerWrapper = mainWrapper.querySelector(".siteNote-header");
+
+        mainWrapper.style.setProperty("background", Colors[color].main, "important");
+        frameDocument.querySelector(".footer").style.setProperty("background", Colors[color].main, "important");
+        headerWrapper.style.setProperty("background", Colors[color].heading, "important");
     }
 }
 

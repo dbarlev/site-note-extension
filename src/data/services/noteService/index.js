@@ -6,7 +6,6 @@ const storage = require("../../storage");
             {
                 id: "",
                 url: "",
-                type: "drag|scale|resize",
                 position:{
                     left,
                     top
@@ -39,26 +38,23 @@ class NotesService {
         return this;
     }
 
-    saveOrEdit(data, type) {
+    saveOrEdit(data) {
         let notesByUrl = this.getSiteNotesByUrl();
         let notesByID = this.getSiteNotesByID(data.id, notesByUrl);
 
         if (notesByUrl && notesByID) {
-            this.update(data, notesByID, type);
+            this.update(data, notesByID);
         }
         else {
-            this.save(data, notesByUrl, type);
+            this.save(data, notesByUrl);
         }
     }
 
-    save(data, notesByUrl, type) {
+    save(data, notesByUrl) {
         let newNoteData = {
             url: location.href,
             ...data
         };
-
-        if (type)
-            newNoteData.type = type;
 
         if (notesByUrl) {
             this.data[location.href].push(newNoteData);
@@ -70,12 +66,23 @@ class NotesService {
         storage.SetToStorage({ notes: this.data });
     }
 
-    update(data, notesByID, type) {
+    update(data, notesByID) {
         let newData = {
             url: location.href,
             ...data
         };
         this.data[location.href][notesByID.index] = newData;
+        storage.SetToStorage({ notes: this.data });
+    }
+
+    remove(id) {
+        let notesByUrl = this.getSiteNotesByUrl();
+        let notesByID = this.getSiteNotesByID(id, notesByUrl);
+        if (notesByUrl && notesByID) {
+            this.data[location.href] = this.data[location.href].filter((note) => {
+                return note.id !== id;
+            });
+        }
         storage.SetToStorage({ notes: this.data });
     }
 

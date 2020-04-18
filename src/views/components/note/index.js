@@ -22,6 +22,7 @@ module.exports = class Note {
                 left: 10,
                 top: 10
             },
+            colorName: "orange",
             text: ""
         }
         this.init();
@@ -39,6 +40,7 @@ module.exports = class Note {
         this.noteParams.id = this.data.id;
         this.id = this.data.id;
         this.noteParams.text = this.data && this.data.text || this.noteParams.text;
+        this.noteParams.colorName = this.data && this.data.colorName || this.noteParams.colorName;
         this.noteParams.width = this.data && this.data.width || this.noteParams.width;
         this.noteParams.height = this.data && this.data.height || this.noteParams.height;
         this.noteParams.position.top = this.data && this.data.position && this.data.position.top || this.noteParams.position.top;
@@ -55,6 +57,7 @@ module.exports = class Note {
         this.noteElement = this.iframeInstance.iframe;
         this.frameContent = this.iframeInstance.iframeDocument;
         this.constructContent();
+        Utils.setNoteColors(this.frameContent, this.id, this.noteParams.colorName);
     }
 
     constructContent() {
@@ -65,35 +68,40 @@ module.exports = class Note {
                     <p class="textarea" contenteditable="true" placeholder="Start typing here..." >${this.noteParams.text}</p>
                 </div>
                 <div class="footer">
-                    ${footerIcons}
-                    ${saveText}
-                    ${chooseColor}
+                    ${footerIcons.html}
+                    ${saveText.html}
+                    ${chooseColor.html}
                 </div>
             </div>
         `;
 
         this.iframeInstance.addHtml(html);
-        let saveElement = this.frameContent.querySelector(".save");
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        const { footerIcons, saveText, chooseColor } = Footer;
+
+        footerIcons.onChangeColor(this.frameContent);
+        footerIcons.onResize(this.frameContent, this.id);
+        footerIcons.onRemove(this.frameContent, this.id, () => {
+            this.notesService.remove(this.id);
+        });
+
+        saveText.onClick(this.frameContent, (text) => {
+            this.noteParams.text = text;
+            this.notesService.saveOrEdit(this.noteParams);
+        });
+
+        chooseColor.onClick(this.frameContent, this.id, (color) => {
+            this.noteParams.colorName = color;
+            this.notesService.saveOrEdit(this.noteParams);
+        });
 
         this.frameContent.querySelector(".textarea").addEventListener("input", () => {
+            let saveElement = this.frameContent.querySelector(".save");
             saveElement.parentElement.classList.add("show");
             saveElement.classList.add("show");
-        });
-
-        this.frameContent.querySelector(".save").addEventListener("click", () => {
-            let text = this.frameContent.querySelector(".textarea").innerText;
-            if (text && text.trim() !== "") {
-                this.noteParams.text = text;
-                this.notesService.saveOrEdit(this.noteParams);
-            }
-            saveElement.parentElement.classList.remove("show");
-            saveElement.classList.remove("show");
-        });
-
-        this.frameContent.querySelector(".icon-container.color").addEventListener("click", () => {
-            saveElement.parentElement.classList.add("show");
-            const colorPlateElement = this.frameContent.querySelector(".chooseColorContainer");
-            colorPlateElement.classList.add("show");
         });
     }
 
@@ -117,7 +125,7 @@ module.exports = class Note {
 
     adjust() {
         const moveable = new Moveable(document.body, {
-            className: this.id,
+            className: `note-moveable ${this.id}`,
             target: document.getElementById(this.id),
             draggable: true,
             resizable: true
@@ -137,7 +145,7 @@ module.exports = class Note {
                 }
             })
             .on("dragEnd", ({ target, left, top }) => {
-                //this.notesService.saveOrEdit(this.noteParams, "drag");
+                this.notesService.saveOrEdit(this.noteParams);
             });
     }
 
@@ -152,7 +160,9 @@ module.exports = class Note {
                 }
             })
             .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
-                //this.notesService.saveOrEdit(this.noteParams, "resize");
+                saveText.onClick(this.frameContent, () => {
+                    this.notesService.saveOrEdit(this.noteParams);
+                }, "resize");
             });
     }
 }
